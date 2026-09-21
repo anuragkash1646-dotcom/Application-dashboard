@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Application Layer Activity &amp; Protocol Visualizer</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <!-- Application Header -->
+  <header class="app-header">
+    <div class="brand-area">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <h1>Layer-7 Protocol Visualizer</h1>
+        <span class="sub-title">RFC-Accurate Application Layer Activity Simulator</span>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-chip" id="connection-status">
+        <span class="status-dot disconnected"></span>
+        <span id="connection-label">Connecting WebSocket...</span>
+      </div>
+      <div class="status-chip" id="activity-badge-container">
+        <span class="activity-badge" id="current-activity-badge">WEB BROWSING</span>
+      </div>
+      <div class="status-chip" id="step-counter-chip">
+        <span class="chip-label">Packet:</span>
+        <span class="chip-val" id="step-counter-text">0 / 0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dual-Panel Dashboard -->
+  <main class="dashboard-layout">
+    <!-- LEFT PANEL: User Activities & Live Activity Log -->
+    <aside class="left-panel">
+      <!-- Activity Tabs Navigation -->
+      <div class="panel-section activity-selector-card">
+        <div class="section-header">
+          <h2>Application Activities</h2>
+          <span class="badge">Select Activity</span>
+        </div>
+        <div class="activity-tabs" role="tablist">
+          <button class="tab-btn active" id="tab-web" data-target="form-web">
+            <span class="tab-icon">🌐</span> Web Browsing
+          </button>
+          <button class="tab-btn" id="tab-smtp" data-target="form-smtp">
+            <span class="tab-icon">✉️</span> Email Dispatch
+          </button>
+          <button class="tab-btn" id="tab-hls" data-target="form-hls">
+            <span class="tab-icon">🎬</span> HLS Video
+          </button>
+        </div>
+
+        <!-- FORM 1: Web Browsing -->
+        <form id="form-web" class="activity-form active">
+          <div class="form-group">
+            <label for="web-url">URL / Web Resource</label>
+            <div class="input-with-action">
+              <input type="url" id="web-url" value="https://example.com/index.html" required placeholder="https://example.com/page.html">
+              <button type="submit" class="btn btn-primary" id="btn-visit">
+                <span>Visit URL</span> ➔
+              </button>
+            </div>
+          </div>
+          <div class="preset-links">
+            <span class="preset-label">Quick Presets:</span>
+            <button type="button" class="preset-tag" data-val="https://example.com/index.html">example.com</button>
+            <button type="button" class="preset-tag" data-val="https://en.wikipedia.org/wiki/OSI_model">Wikipedia</button>
+            <button type="button" class="preset-tag" data-val="http://ietf.org/rfc/rfc2616.txt">IETF RFC</button>
+          </div>
+          <div class="activity-info-callout">
+            <strong>Protocols Simulated:</strong> DNS (UDP 53, A-record, RD 0x0100) ➔ TCP 3-Way Handshake (Port 80) ➔ HTTP/1.1 GET &amp; 200 OK.
+          </div>
+        </form>
+
+        <!-- FORM 2: SMTP Email -->
+        <form id="form-smtp" class="activity-form">
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="smtp-sender">Sender (MAIL FROM)</label>
+              <input type="email" id="smtp-sender" value="alice@example.com" required>
+            </div>
+            <div class="form-group half">
+              <label for="smtp-recipient">Recipient (RCPT TO)</label>
+              <input type="email" id="smtp-recipient" value="bob@example.com" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="smtp-subject">Subject</label>
+            <input type="text" id="smtp-subject" value="Quarterly Network Architecture Update" required>
+          </div>
+          <div class="form-group">
+            <label for="smtp-body">Message Content (DATA)</label>
+            <textarea id="smtp-body" rows="3" required>Hello Bob,
+
+The RFC 5321 SMTP conversation test has been initialized.
+
+Regards,
+Alice</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-send-email">
+            <span>Send Email via SMTP</span> ✉️
+          </button>
+          <div class="activity-info-callout">
+            <strong>Protocols Simulated:</strong> TCP Port 25 ➔ 220 Service Ready ➔ EHLO ➔ 250 ESMTP ➔ MAIL FROM ➔ RCPT TO ➔ DATA (354) ➔ MIME Payload ➔ 250 Queued ➔ QUIT ➔ 221 Bye.
+          </div>
+        </form>
+
+        <!-- FORM 3: HLS Video Streaming -->
+        <form id="form-hls" class="activity-form">
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="hls-stream">Live Stream</label>
+              <select id="hls-stream">
+                <option value="live/conference-keynote">live/conference-keynote</option>
+                <option value="vod/networks-lecture-01">vod/networks-lecture-01</option>
+                <option value="sports/world-championship">sports/world-championship</option>
+              </select>
+            </div>
+            <div class="form-group half">
+              <label for="hls-bitrate">Stream Quality / Bitrate</label>
+              <select id="hls-bitrate">
+                <option value="1080p">1080p (5.0 Mbps)</option>
+                <option value="720p" selected>720p (2.5 Mbps)</option>
+                <option value="360p">360p (800 Kbps)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Video Mock Display & Buffer Meter -->
+          <div class="video-mock-card">
+            <div class="video-mock-screen" id="video-screen">
+              <div class="video-overlay-status">
+                <span class="badge live-badge">● STREAM READY</span>
+                <span class="badge res-badge" id="video-res-display">720p HD</span>
+              </div>
+              <div class="video-center-icon" id="video-center-icon">▶</div>
+              <div class="video-footer-info">
+                <span id="video-segment-label">Waiting to buffer...</span>
+              </div>
+            </div>
+
+            <!-- Buffer Health Bar -->
+            <div class="buffer-meter-container">
+              <div class="buffer-meter-header">
+                <span class="meter-title">Client Video Buffer Health</span>
+                <span class="meter-value" id="buffer-val-text">0.0s / 16.0s</span>
+              </div>
+              <div class="meter-track">
+                <div class="meter-fill" id="buffer-meter-fill" style="width: 0%;"></div>
+                <div class="meter-marker" style="left: 25%;">4s</div>
+                <div class="meter-marker" style="left: 50%;">8s</div>
+                <div class="meter-marker" style="left: 75%;">12s</div>
+                <div class="meter-marker" style="left: 100%;">16s</div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="btn-start-hls">
+            <span>Start HLS Stream</span> 🎬
+          </button>
+          <div class="activity-info-callout">
+            <strong>Protocols Simulated:</strong> CDN Hostname DNS ➔ HTTP GET master.m3u8 ➔ 200 OK Variants ➔ GET variant playlist ➔ Progressive 4-second MPEG-TS segment ingest &amp; buffer telemetry.
+          </div>
+        </form>
+      </div>
+
+      <!-- Chronological Activity Log -->
+      <div class="panel-section activity-log-card">
+        <div class="section-header">
+          <h2>Activity Log</h2>
+          <button type="button" class="btn-sm-ghost" id="btn-clear-log">Clear</button>
+        </div>
+        <div class="log-entries-scroll" id="activity-log-list">
+          <!-- Dynamically populated log entries -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT PANEL: Protocol Flow Visualizer & Wire Data Inspector -->
+    <section class="right-panel">
+      <!-- Animated Client <--> Server Node Flow Diagram -->
+      <div class="panel-section flow-stage-card">
+        <div class="stage-header">
+          <span class="stage-title">Client ↔ Server Transmission Wire</span>
+          <div class="protocol-status-badge-group">
+            <span class="proto-tag" id="flow-proto-badge">DNS</span>
+            <span class="direction-tag" id="flow-dir-badge">Client ➔ Server</span>
+            <span class="state-tag" id="flow-state-badge">READY</span>
+          </div>
+        </div>
+
+        <div class="network-nodes-stage">
+          <!-- Client Node -->
+          <div class="node-box client-node" id="client-node">
+            <div class="node-icon-circle">💻</div>
+            <div class="node-details">
+              <span class="node-name">Client Device</span>
+              <span class="node-role" id="client-role-text">Browser / User Agent</span>
+              <code class="node-endpoint" id="client-endpoint-text">192.168.1.105:54321</code>
+            </div>
+          </div>
+
+          <!-- Connecting Wire / Channel with Animated Packet Flight -->
+          <div class="wire-channel-box">
+            <div class="wire-track-line">
+              <div class="animated-packet-bubble" id="animated-packet">
+                <span class="packet-arrow-icon" id="packet-arrow">➔</span>
+                <span class="packet-label" id="packet-label">DNS</span>
+              </div>
+            </div>
+            <div class="wire-stats">
+              <span class="wire-port-tag" id="wire-port-label">UDP :53</span>
+              <span class="wire-latency-tag">RTT: ~14ms</span>
+            </div>
+          </div>
+
+          <!-- Server Node -->
+          <div class="node-box server-node" id="server-node">
+            <div class="node-icon-circle">🖧</div>
+            <div class="node-details">
+              <span class="node-name" id="server-name-text">DNS Resolver</span>
+              <span class="node-role" id="server-role-text">Recursive DNS Authority</span>
+              <code class="node-endpoint" id="server-endpoint-text">8.8.8.8:53</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-summary-bar">
+          <span class="summary-label">EVENT SUMMARY:</span>
+          <span class="summary-text" id="event-summary-text">Ready to simulate protocol interactions.</span>
+        </div>
+      </div>
+
+      <!-- Packet Inspector & Monospace Wire Data Panel -->
+      <div class="panel-section packet-inspector-card">
+        <div class="inspector-tabs-bar">
+          <div class="tab-group" role="tablist">
+            <button class="inspector-tab active" data-view="view-rfc">
+              <span class="tab-ico">📜</span> RFC Wire / ASCII
+            </button>
+            <button class="inspector-tab" data-view="view-headers">
+              <span class="tab-ico">🔍</span> Headers &amp; Metadata
+            </button>
+            <button class="inspector-tab" data-view="view-payload">
+              <span class="tab-ico">📄</span> Payload Preview
+            </button>
+          </div>
+          <button class="btn-copy-code" id="btn-copy-wire" title="Copy wire frame to clipboard">
+            📋 Copy Wire
+          </button>
+        </div>
+
+        <div class="inspector-body">
+          <!-- View 1: RFC-Style Monospace Wire Representation -->
+          <div class="inspector-view active" id="view-rfc">
+            <pre class="monospace-wire-display" id="wire-data-pre">Waiting for simulation event...</pre>
+          </div>
+
+          <!-- View 2: Key-Value Headers & Metadata Table -->
+          <div class="inspector-view" id="view-headers">
+            <div class="metadata-table-wrapper">
+              <table class="metadata-table" id="metadata-table">
+                <thead>
+                  <tr>
+                    <th>Field / Header</th>
+                    <th>Decoded Value / Semantic</th>
+                  </tr>
+                </thead>
+                <tbody id="metadata-tbody">
+                  <tr>
+                    <td colspan="2" class="empty-hint">Select or play an event to inspect parsed headers.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- View 3: Visual Payload Preview (HTML/MIME/M3U8) -->
+          <div class="inspector-view" id="view-payload">
+            <div class="payload-preview-box" id="payload-preview-content">
+              <div class="empty-hint">No body payload present in current packet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- BOTTOM TIMELINE BAR & INTERACTIVE CONTROLS -->
+  <footer class="app-timeline-footer">
+    <div class="timeline-container">
+      <!-- Control Buttons -->
+      <div class="playback-controls">
+        <button class="ctrl-btn" id="btn-prev" title="Step Previous (Keyboard: Left Arrow)">
+          ⏮ <span>Step Prev</span>
+        </button>
+        <button class="ctrl-btn ctrl-btn-primary" id="btn-play-pause" title="Play/Pause (Keyboard: Spacebar)">
+          <span id="play-pause-icon">▶</span> <span id="play-pause-text">Resume</span>
+        </button>
+        <button class="ctrl-btn" id="btn-next" title="Step Next (Keyboard: Right Arrow)">
+          <span>Step Next</span> ⏭
+        </button>
+        <button class="ctrl-btn" id="btn-replay" title="Replay from Event 1 (Keyboard: R)">
+          🔄 <span>Replay</span>
+        </button>
+        <div class="speed-control-group">
+          <label for="speed-select">Speed:</label>
+          <select id="speed-select">
+            <option value="0.5">0.5x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2.0">2.0x</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Numbered Circular Event Nodes Track -->
+      <div class="timeline-nodes-track-scroll">
+        <div class="timeline-nodes-track" id="timeline-nodes-container">
+          <!-- Dynamically populated circular nodes -->
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
